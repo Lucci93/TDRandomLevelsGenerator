@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Diagnostics;
 
 public class PathGenerator : MonoBehaviour {
 
@@ -11,9 +10,9 @@ public class PathGenerator : MonoBehaviour {
 	public Map[] maps;
 
     // contains all the tile
-    Node[] coordTales;
+    List<Node> grid;
 	// get a reference to the map
-    Map grid;
+    Map currentMap;
     // current map index
     int mapIndex;
 	// parent of the grid
@@ -34,140 +33,103 @@ public class PathGenerator : MonoBehaviour {
     }
 
     void NewMap() {
-		// just for debug
-		Stopwatch sw = new Stopwatch();
-		sw.Start();
         // choose the map
         mapIndex++;
 		// generate the map with a random path
 		GenerateMap();
 		// create a path for the enemies
+		// use the pathfinding A* algorithm to reach a target
+		PathfindingAStar pathfinder = new PathfindingAStar(grid, currentMap);
 		// draw the map
-		CreateMap(CreatePath());
-		sw.Stop();
-		// record 23 ms for first map
-		// record 16 ms for second map
-		// record 38 ms for third map
-		// record 3 ms for fourth map
-		UnityEngine.Debug.Log("Path found in: " + sw.ElapsedMilliseconds + " ms");
+		CreateMap(pathfinder.FindPath());
 	}
 
-    // create a path with A*
-    Node[] CreatePath() {
-		while (true) {
-			// use the pathfinding A* algorithm to reach a target
-			PathfindingAStar pathfinder = new PathfindingAStar(coordTales, grid);
-			// search a path
-			List<Node> path = new List<Node>(pathfinder.FindPath());
-			if (path.Count > 1) {
-                // found
-                return path.ToArray();
-			}
-            // use the nearest point to the target to carve a path
-            CarvePathInGrid(path[0]);
-		}
-    }
-
-    // generate a hole between the nearest point to the target and the target in the grid
-    void CarvePathInGrid(Node minNode) {
-        while (true) {
-            Node nearObstacle = GetNeighboursObstaclesCoord(minNode)[0];
-			// remove obstacle to path
-            coordTales[Utility.FindNodeIndex(coordTales, nearObstacle.x, nearObstacle.y)].notWalkable = false;
-            Node direction = GetDirection(nearObstacle, minNode);
-
-            // check if in this direction there is another obstacle
-            if (coordTales[Utility.FindNodeIndex(coordTales, nearObstacle.x + direction.x, nearObstacle.y + direction.y)].notWalkable) {
-                // repeat
-                minNode = nearObstacle;
-    		}
-            else {
-                return;
+        // return all the neighbours 
+    List<Node> GetNeighboursNode(Node currentNode) {
+        List<Node> neighbours = new List<Node>();
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                // not check diagonals
+                if (x == 0 && y == 0 || x == 1 && y == 1 || x == 1 && y == -1 || x == -1 && y == 1 || x == -1 && y == -1) {
+                    continue;
+                }
+                // check if is inside the grid
+                int checkX = currentNode.x + x;
+                int checkY = currentNode.y + y;
+                if (checkX > 0 && checkX < currentMap.mapSize.x-1 && checkY > 0 && checkY < currentMap.mapSize.y-1) {
+                    // Add to the neighbours
+                    neighbours.Add(grid.Find(e => e.x == checkX && e.y == checkY));
+                }
             }
         }
-    }
-
-    // get the direction between two coords
-    Node GetDirection(Node newCoord, Node oldCoord) {
-        int x = newCoord.x - oldCoord.x;
-        int y = newCoord.y - oldCoord.y;
-        return new Node(x, y, false);
+        return neighbours;
     }
 
     // add path to the map
-    void FillWithPath(Node[] path) {
-		int count = 0;
-        for (int x = 0; x < coordTales.Length; x++) {
-            for (int y = 0; y < path.Length; y++) {
-				if (path[y].x == coordTales[x].x && path[y].y == coordTales[x].y) {
-                    // set as ground
-                    coordTales[x].notWalkable = true;
-                    count++;
-					break;
-				}
-			}
-            // check all the path
-            if (count >= path.Length) {
-                return;
+    void FillWithPath(List<Node> path) {
+        int count = 0;
+        foreach (Node item in grid) {
+            // node found
+            if (path.Exists(e => e.x == item.x && e.y == item.y)) {
+				// set as path
+				item.notWalkable = true;
+                count++;
+            }
+            // stop the foreach if all the node are setted
+            if (count == path.Count) {
+                break;
             }
         }
-        coordTales[Utility.FindNodeIndex(coordTales, grid.start.x, grid.start.y)].notWalkable = true;
-        coordTales[Utility.FindNodeIndex(coordTales, 0, 0)].notWalkable = false;
+        grid.Find(e => e.x == currentMap.start.x && e.y == currentMap.start.y).notWalkable = true;
+        grid.Find(e => e.x == 0 && e.y == 0).notWalkable = false;
     }
 
     // generate the map
-    void CreateMap(Node[] path) {
+    void CreateMap(List<Node> path) {
         // reset map
         InitializeMatrix();
         // generate the path
         FillWithPath(path);
 
-		int posX = 0;
-        int count = 0;
-        for (int x = 0; x < grid.mapSize.x; x++) {
-			int posY = 0;
-			for (int y = 0; y < grid.mapSize.y; y++) {
-                // instantiate node
-                if (!coordTales[count].notWalkable) {
-                    Instantiate(node, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
-				}
-				// instatiate ground
-				else {
-					Instantiate(ground, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
-				}
-				posY += threshold;
-                count++;
-			}
-			posX += threshold;
-		}
+        // draw grid map
+        foreach (Node item in grid) {
+            int posX = item.x * threshold;
+            int posY = item.y * threshold;
+            // instantiate free cell
+            if (item.notWalkable) {
+                Instantiate(ground, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
+            }
+            // instatiate path cell
+            else {
+                Instantiate(node, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
+            }
+        }
 	}
 
     void InitializeMatrix() {
-		int count = 0;
-		for (int x = 0; x < grid.mapSize.x; x++) {
-			for (int y = 0; y < grid.mapSize.y; y++) {
+		grid = new List<Node>();
+		for (int x = 0; x < currentMap.mapSize.x; x++) {
+			for (int y = 0; y < currentMap.mapSize.y; y++) {
 				// node add to grid
-				coordTales[count] = new Node(x, y, false);
-				count++;
+                grid.Add(new Node(x, y, false));
 			}
 		}
     }
 
 	void GenerateMap() {
 		// create the matrix
-		grid = maps[mapIndex-1];
-		coordTales = new Node[grid.mapSize.x * grid.mapSize.y];
+        currentMap = maps[mapIndex-1];
 
 		// add color to the map elements
-		ground.GetComponent<MeshRenderer>().sharedMaterial.color = grid.groundsColor;
-		node.GetComponent<MeshRenderer>().sharedMaterial.color = grid.nodesColor;
+		ground.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.groundsColor;
+		node.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.nodesColor;
 
         // reset map
         ResetMapGrid();
 
 		InitializeMatrix();
 		// get the shuffled tiles coords queue using the shuffled algorithm with the list of coords
-		shuffledTilesCoords = new Queue<Node>(Utility.ShuffleArray((Node[])coordTales.Clone(), grid.seed));
+        shuffledTilesCoords = new Queue<Node>(Utility.ShuffleList(new List<Node>(grid), currentMap.seed));
         // Add obstacles to the map
         AddObstacles();
 	}
@@ -190,23 +152,22 @@ public class PathGenerator : MonoBehaviour {
 
 	void AddObstacles() {
 		// number of obstacles based on the size of the map
-        int groundCount = (int)(grid.groundPercent * grid.mapSize.x * grid.mapSize.y);
+        int groundCount = (int)(currentMap.groundPercent * currentMap.mapSize.x * currentMap.mapSize.y);
 		// total of instantiated obstacles 
 		int currentGroundCount = 0;
 
 		// spawn the obstacol based on the obstacle count
 		for (int i = 0; i < groundCount; i++) {
 			Node randomCoord = GetRandomCoord();
-            if (randomCoord != grid.start && randomCoord != grid.end) {
-                int coordIndex = Utility.FindNodeIndex(coordTales, randomCoord.x, randomCoord.y);
+            if (randomCoord != currentMap.start && randomCoord != currentMap.end) {
                 // assign map coordinate obstacles
-                coordTales[coordIndex].notWalkable = true;
+                grid.Find(e => e.x == randomCoord.x && e.y == randomCoord.y).notWalkable = true;
                 currentGroundCount++;
                 // check if randomCoord is not on the start or end alis spawning point and target and there is no obstacles
                 if (!MapIsFullyAccessible(currentGroundCount)) {
                     // if i can't create a new obstacole in that position
                     // remove the obstacles
-                    coordTales[coordIndex].notWalkable = false;
+                    grid.Find(e => e.x == randomCoord.x && e.y == randomCoord.y).notWalkable = false;
                     currentGroundCount--;
                 }
             }
@@ -216,14 +177,14 @@ public class PathGenerator : MonoBehaviour {
 	// check if there are area locked for the movement of the player becaouse of obstacles
 	bool MapIsFullyAccessible(int currentObstacleCount) {
         // copy of the map obstacle
-        Node[] mapFlags = (Node[])coordTales.Clone();
+        List<Node> mapFlags = new List<Node>(grid);
 		Queue<Node> queue = new Queue<Node>();
 		// we start by start and end because we are sure that are not fill
 		// add start and end to the queue and set it on true on the map
-        queue.Enqueue(grid.start);
-        mapFlags[Utility.FindNodeIndex(mapFlags, grid.start.x, grid.start.y)].notWalkable = true;
-		queue.Enqueue(grid.end);
-		mapFlags[Utility.FindNodeIndex(mapFlags, grid.end.x, grid.end.y)].notWalkable = true;
+        queue.Enqueue(currentMap.start);
+        mapFlags.Find(e => e.x == currentMap.start.x && e.y == currentMap.end.y).notWalkable = true;
+		queue.Enqueue(currentMap.end);
+        mapFlags.Find(e => e.x == currentMap.end.x && e.y == currentMap.end.y).notWalkable = true;
 
 		// keep track of all the tile visited, it start from one because the center tiles is accessible
 		int accessibleTileCount = 2;
@@ -241,13 +202,11 @@ public class PathGenerator : MonoBehaviour {
 					// in that way we don't check the diagonals
 					if (x == 0 || y == 0) {
 						// if we are inside the obstacle map
-                        if (neighbourX >= 0 && neighbourX < grid.mapSize.x && neighbourY >= 0 && neighbourY < grid.mapSize.y){
-                            int neighbourIndex = Utility.FindNodeIndex(mapFlags, neighbourX, neighbourY);
-                            int groundIndex = Utility.FindNodeIndex(coordTales, neighbourX, neighbourY);
+                        if (neighbourX >= 0 && neighbourX < currentMap.mapSize.x && neighbourY >= 0 && neighbourY < currentMap.mapSize.y){
 							// we have not checked this tile and is not an obstacle
-                            if (!mapFlags[neighbourIndex].notWalkable && !coordTales[groundIndex].notWalkable) {
+                            if (!mapFlags.Find(e => e.x == neighbourX && e.y == neighbourY).notWalkable && !grid.Find(e => e.x == neighbourX && e.y == neighbourY).notWalkable) {
 								// so is free from obstacles
-                                mapFlags[neighbourIndex].notWalkable = true;
+                                mapFlags.Find(e => e.x == neighbourX && e.y == neighbourY).notWalkable = true;
 								queue.Enqueue(new Node(neighbourX, neighbourY, true));
 								accessibleTileCount++;
 							}
@@ -257,30 +216,8 @@ public class PathGenerator : MonoBehaviour {
 			}
 		}
 		// how many tiles should there be
-		int targetAccessibleTileCount = grid.mapSize.x * grid.mapSize.y - currentObstacleCount;
+        int targetAccessibleTileCount = (currentMap.mapSize.x * currentMap.mapSize.y) - currentObstacleCount;
 		return targetAccessibleTileCount == accessibleTileCount;
-	}
-
-	// return all the neighbours 
-    List<Node> GetNeighboursObstaclesCoord(Node currentNode) {
-        List<Node> neighbours = new List<Node>();
-		for (int x = -1; x <= 1; x++) {
-			for (int y = -1; y <= 1; y++) {
-				// not check diagonals
-				if (x == 0 && y == 0 || x == 1 && y == 1 || x == 1 && y == -1 || x == -1 && y == 1 || x == -1 && y == -1) {
-					continue;
-				}
-				// check if is inside the grid
-				int checkX = currentNode.x + x;
-				int checkY = currentNode.y + y;
-                // chek if is out of bounds and a ostacle
-                if (checkX > 0 && checkX < grid.mapSize.x-1 && checkY > 0 && checkY < grid.mapSize.y-1 && coordTales[Utility.FindNodeIndex(coordTales, checkX, checkY)].notWalkable) {
-                    // Add to the neighbours
-                    neighbours.Add(coordTales[Utility.FindNodeIndex(coordTales, checkX, checkY)]);
-				}
-			}
-		}
-		return neighbours;
 	}
 
 	Node GetRandomCoord() {
