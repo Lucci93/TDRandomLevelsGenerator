@@ -9,10 +9,18 @@ public class PathfindingAStar {
 
     Node startNode;
     Node endNode;
+	// weight of a diagonal movement in the pathfinding
+	int diagonalWeight;
+	// weight of horizontal or vertical movement in the pathfinding
+    int verticalWeight;
+    int horizontalWeight;
 
-    public PathfindingAStar(List<Node> grid, Map currentMap) {
+    public PathfindingAStar(List<Node> grid, Map currentMap, int diagonalWeight, int verticalWeight, int horizontalWeight) {
         this.grid = grid;
 		this.currentMap = currentMap;
+        this.diagonalWeight = diagonalWeight;
+        this.verticalWeight = verticalWeight;
+        this.horizontalWeight = horizontalWeight;
         startNode = grid.Find(e => e.x == currentMap.start.x && e.y == currentMap.start.y);
         endNode = grid.Find(e => e.x == currentMap.end.x && e.y == currentMap.end.y);
     }
@@ -21,7 +29,7 @@ public class PathfindingAStar {
     public List<Node> FindPath() {
 		// repeat until a valid path will be found
 		while (true) {
-            Heap<Node> openSet = new Heap<Node>(currentMap.MaxSize);
+            Heap<Node> openSet = new Heap<Node>(grid.Count);
             HashSet<Node> closedSet = new HashSet<Node>();
             // used to get the min distance from the target if not reached to carve a path until it
             Node minNode = startNode;
@@ -100,9 +108,9 @@ public class PathfindingAStar {
 		int distX = Mathf.Abs(nodeA.x - nodeB.x);
 		int distY = Mathf.Abs(nodeA.y - nodeB.y);
 		if (distX > distY) {
-            return (Constant.DIAGONAL_WEIGHT * distY) + Constant.VERT_OR_HOR_WEIGHT * (distX - distY);
+            return (diagonalWeight * distY) + (horizontalWeight * distX) - (verticalWeight * distY);
 		}
-        return (Constant.DIAGONAL_WEIGHT * distX) + Constant.VERT_OR_HOR_WEIGHT * (distY - distX);
+        return (diagonalWeight * distX) + (verticalWeight * distY) - (horizontalWeight * distX);
 	}
 
 	// retrive the path searched from parent nodes

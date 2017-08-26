@@ -3,9 +3,14 @@ using UnityEngine;
 
 public class PathGenerator : MonoBehaviour {
 
-	public GameObject node;
-	public GameObject ground;
-	public int threshold;
+	public GameObject freeCellObject;
+	public GameObject pathObject;
+    public int cellThreshold;
+	// weight of a diagonal movement in the pathfinding
+	public int diagonalWeight;
+	// weight of horizontal or vertical movement in the pathfinding
+    public int verticalWeight;
+    public int horizontalWeight;
 	// map generator can menage a lot of different map
 	public Map[] maps;
 
@@ -39,7 +44,7 @@ public class PathGenerator : MonoBehaviour {
 		GenerateMap();
 		// create a path for the enemies
 		// use the pathfinding A* algorithm to reach a target
-		PathfindingAStar pathfinder = new PathfindingAStar(grid, currentMap);
+        PathfindingAStar pathfinder = new PathfindingAStar(grid, currentMap, diagonalWeight, verticalWeight, horizontalWeight);
 		// draw the map
 		CreateMap(pathfinder.FindPath());
 	}
@@ -93,15 +98,15 @@ public class PathGenerator : MonoBehaviour {
 
         // draw grid map
         foreach (Node item in grid) {
-            int posX = item.x * threshold;
-            int posY = item.y * threshold;
+            int posX = item.x * cellThreshold;
+            int posY = item.y * cellThreshold;
             // instantiate free cell
             if (item.notWalkable) {
-                Instantiate(ground, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
+                Instantiate(pathObject, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
             }
             // instatiate path cell
             else {
-                Instantiate(node, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
+                Instantiate(freeCellObject, new Vector3(posX, 0f, posY), Quaternion.identity, parentT);
             }
         }
 	}
@@ -121,8 +126,8 @@ public class PathGenerator : MonoBehaviour {
         currentMap = maps[mapIndex-1];
 
 		// add color to the map elements
-		ground.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.groundsColor;
-		node.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.nodesColor;
+        pathObject.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.pathCellColor;
+        freeCellObject.GetComponent<MeshRenderer>().sharedMaterial.color = currentMap.freeCellColor;
 
         // reset map
         ResetMapGrid();

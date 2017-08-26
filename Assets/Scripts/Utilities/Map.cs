@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 
 // show up in the inspector
-[System.Serializable]
-public class Map {
+[CreateAssetMenu(fileName = "New Map")]
+public class Map : ScriptableObject {
+    // name of the level
+    new public string name = "New Level";
+
 	public Node mapSize;
 	// define where enemies spawn
 	public Node start;
@@ -12,12 +15,6 @@ public class Map {
 	[Range(0.5f, 1)] public double groundPercent;
 	// seed for the pseudorandom generation of the obstacles
 	public int seed;
-	public Color nodesColor;
-	public Color groundsColor;
-
-	public int MaxSize {
-		get {
-            return mapSize.x * mapSize.y;
-		}
-	}
+	public Color freeCellColor;
+	public Color pathCellColor;
 }

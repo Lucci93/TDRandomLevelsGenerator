@@ -3,6 +3,7 @@
 The project allow you to generate random levels for a tower defense game made in Unity.
 You can define for each level:
 
+* the **weights** of *diagonal, vertical and horizontal* cost for the pathfinding algorithm
 * the **size** of the grid
 * the **start** point and the **end** point of the path generated
 * the **colors** of the background and trail
@@ -30,7 +31,7 @@ Download or clone the repository and launch the *Main.unity* file inside the *As
 ## Running the tests
 
 
-Add all the levels you want in the editor and after pressing *play*, press *N* on the keyboard to generate the next level.
+Add all the custom levels you want in the editor (right click on the asset window and then choose "Map" to create a new map) and after pressing *play*, press *N* on the keyboard to generate the next level.
 Before you begin, make sure you **have correctly set the start and end points** of the route, so that you have:
 
 ```C#

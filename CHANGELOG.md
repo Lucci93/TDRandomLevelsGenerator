@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2017-08-26
+
+### Added
+
+- Added a session in README.md to explain how to use the new changes
+
+### Changed
+
+- Replaced constant weight with public variables
+- Maps are now serializableObject
+
+### Removed
+
+- Removed Constant file
+- MaxSize variable removed for memory boost from class Map
+
+### Fixed
+
+- Code is now more readable
+
 ## [1.2.0] - 2017-08-26
 
 ### Changed
