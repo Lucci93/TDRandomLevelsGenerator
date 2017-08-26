@@ -1,7 +1,11 @@
 # Tower Defense Random Levels Generator
 
 The project allow you to generate random levels for a tower defense game made in Unity.
-You can define the **size** of the grid, the start point and the end point of the path follow by enemies IA and the colors of the background and trail for each level.
+You can define for each level:
+
+* the **size** of the grid
+* the **start** point and the **end** point of the path generated
+* the **colors** of the background and trail
 
 <p align="center">
   <img width="460" height="420" src="https://github.com/Lucci93/TDRandomLevelsGenerator/blob/master/store-assets/slide.gif">
