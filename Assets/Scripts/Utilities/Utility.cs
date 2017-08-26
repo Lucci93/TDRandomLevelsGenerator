@@ -23,37 +23,14 @@ public static class Utility {
         return array;
     }
 
-    // transform coord array in node array
-    public static Node[] CoordToNodeArray(Coord[] coords, Map currentMap) {
-        int count = 0;
-        Node[] nodeTiles = new Node[currentMap.MaxSize];
-        foreach (Coord coord in coords) {
-            nodeTiles[count] = new Node(coord.x, coord.y, !coord.walkable);
-            count++;
-        }
-        return nodeTiles;
-    }
-
-	// transform coord array in node array
-	public static Coord[] NodeToCoordArray(Node[] nodes, Map currentMap) {
-		int count = 0;
-		Coord[] nodeTiles = new Coord[currentMap.MaxSize];
-		foreach (Node node in nodes) {
-            nodeTiles[count] = new Coord(node.x, node.y, !node.walkable);
-			count++;
-		}
-		return nodeTiles;
-	}
-
-    public static int FindCoordIndex(Coord[] array, int a, int b) {
-        int count = 0;
+    // return the node searched in the grid
+    public static Node FindNode(Node[] array, int a, int b) {
         for (int i = 0; i < array.Length; i++) {
             if (array[i].x == a && array[i].y == b) {
-                return count;
+                return array[i];
             }
-            count++;
         }
-        return count;
+        return null;
     }
 
 	public static int FindNodeIndex(Node[] array, int a, int b) {
@@ -67,25 +44,6 @@ public static class Utility {
 		return count;
 	}
 
-    // just for debug print a coord grid on terminal
-	public static void PrintCoordGrid(Coord[] grid, Map map) {
-		Debug.Log("---- MATRIX ----");
-		string text = "";
-		for (int x = 0; x < map.mapSize.x; x++) {
-			for (int y = 0; y < map.mapSize.y; y++) {
-                if (grid[FindCoordIndex(grid, x, y)].walkable) {
-					// node add to grid
-					text += "1" + " ";
-				}
-				else {
-					text += "0" + " ";
-				}
-			}
-			text += "\n";
-		}
-		Debug.Log(text);
-	}
-
 	// just for debug print a node grid on terminal
 	public static void PrintNodeGrid(Node[] grid, Map map) {
 		Debug.Log("---- NODES ----");
@@ -93,7 +51,7 @@ public static class Utility {
 		for (int x = 0; x < map.mapSize.x; x++) {
 			for (int y = 0; y < map.mapSize.y; y++) {
                 if (grid[FindNodeIndex(grid, x, y)].parent == null) {
-                    if (grid[FindNodeIndex(grid, x, y)].walkable) {
+                    if (grid[FindNodeIndex(grid, x, y)].notWalkable) {
                         // node add to grid
                         text += "0" + " ";
                     }

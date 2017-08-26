@@ -7,7 +7,7 @@ public class Node : IHeapItem<Node> {
 	public int y;
 
     [HideInInspector]
-	public bool walkable;
+	public bool notWalkable;
     [HideInInspector]
 	public Node parent;
     [HideInInspector]
@@ -24,7 +24,7 @@ public class Node : IHeapItem<Node> {
 	int heapIndex;
 
 	public Node(int x, int y, bool walkable) {
-		this.walkable = walkable;
+		this.notWalkable = walkable;
 		this.x = x;
 		this.y = y;
 	}

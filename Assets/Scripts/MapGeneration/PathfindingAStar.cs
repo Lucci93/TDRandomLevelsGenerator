@@ -8,11 +8,11 @@ public class PathfindingAStar {
     Node startNode;
     Node endNode;
 
-    public PathfindingAStar(Coord[] grid, Map currentMap) {
-        this.grid = Utility.CoordToNodeArray(grid, currentMap);
+    public PathfindingAStar(Node[] grid, Map currentMap) {
+        this.grid = grid;
 		this.currentMap = currentMap;
-        startNode = FindNodeFromCoord(currentMap.start);
-        endNode = FindNodeFromCoord(currentMap.end);
+        startNode = Utility.FindNode(grid, currentMap.start.x, currentMap.start.y);
+        endNode = Utility.FindNode(grid, currentMap.end.x, currentMap.end.y);
     }
 
 	// find a path from a start to a target point
@@ -36,7 +36,7 @@ public class PathfindingAStar {
 
             foreach (Node neighbour in GetNeighboursNode(currentNode)) {
 				// if the neighbour is not ok, check another
-                if (!neighbour.walkable || closedSet.Contains(neighbour)) {
+                if (neighbour.notWalkable || closedSet.Contains(neighbour)) {
 					continue;
 				}
                 int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
@@ -103,15 +103,5 @@ public class PathfindingAStar {
 			}
 		}
 		return neighbours;
-	}
-
-	// search a node in the grid
-	public Node FindNodeFromCoord(Coord coord) {
-		foreach (Node node in grid) {
-			if (node.x == coord.x && node.y == coord.y) {
-				return node;
-			}
-		}
-		return null;
 	}
 }

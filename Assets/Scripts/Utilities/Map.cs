@@ -3,11 +3,11 @@
 // show up in the inspector
 [System.Serializable]
 public class Map {
-	public Coord mapSize;
+	public Node mapSize;
 	// define where enemies spawn
-	public Coord start;
+	public Node start;
 	// define where enemies arrive
-	public Coord end;
+	public Node end;
 	// number of obstacle to spawn in percentage
 	[Range(0.5f, 1)] public double groundPercent;
 	// seed for the pseudorandom generation of the obstacles
