@@ -1,13 +1,18 @@
 ﻿using UnityEngine;
 
+[System.Serializable]
 public class Node : IHeapItem<Node> {
 
-	public bool walkable;
-	public int gridX;
-	public int gridY;
-	public Node parent;
+	public int x;
+	public int y;
 
+    [HideInInspector]
+	public bool walkable;
+    [HideInInspector]
+	public Node parent;
+    [HideInInspector]
 	public int gCost;
+    [HideInInspector]
 	public int hCost;
 
 	public int FCost {
@@ -18,10 +23,10 @@ public class Node : IHeapItem<Node> {
 
 	int heapIndex;
 
-	public Node(bool _walkable, int _gridX, int _gridY) {
-		walkable = _walkable;
-		gridX = _gridX;
-		gridY = _gridY;
+	public Node(int x, int y, bool walkable) {
+		this.walkable = walkable;
+		this.x = x;
+		this.y = y;
 	}
 
 	public int HeapIndex {

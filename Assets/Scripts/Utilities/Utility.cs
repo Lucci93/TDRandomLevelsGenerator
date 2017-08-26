@@ -28,7 +28,7 @@ public static class Utility {
         int count = 0;
         Node[] nodeTiles = new Node[currentMap.MaxSize];
         foreach (Coord coord in coords) {
-            nodeTiles[count] = new Node(!coord.isGround, coord.x, coord.y);
+            nodeTiles[count] = new Node(coord.x, coord.y, !coord.walkable);
             count++;
         }
         return nodeTiles;
@@ -39,7 +39,7 @@ public static class Utility {
 		int count = 0;
 		Coord[] nodeTiles = new Coord[currentMap.MaxSize];
 		foreach (Node node in nodes) {
-            nodeTiles[count] = new Coord(node.gridX, node.gridY, !node.walkable);
+            nodeTiles[count] = new Coord(node.x, node.y, !node.walkable);
 			count++;
 		}
 		return nodeTiles;
@@ -59,7 +59,7 @@ public static class Utility {
 	public static int FindNodeIndex(Node[] array, int a, int b) {
 		int count = 0;
 		for (int i = 0; i < array.Length; i++) {
-			if (array[i].gridX == a && array[i].gridY == b) {
+			if (array[i].x == a && array[i].y == b) {
 				return count;
 			}
 			count++;
@@ -73,7 +73,7 @@ public static class Utility {
 		string text = "";
 		for (int x = 0; x < map.mapSize.x; x++) {
 			for (int y = 0; y < map.mapSize.y; y++) {
-				if (grid[FindCoordIndex(grid, x, y)].isGround) {
+                if (grid[FindCoordIndex(grid, x, y)].walkable) {
 					// node add to grid
 					text += "1" + " ";
 				}

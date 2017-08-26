@@ -3,16 +3,16 @@ using UnityEngine;
 
 public class PathfindingAStar {
 
-    public Node[] nodes;
+    public Node[] grid;
     readonly Map currentMap;
     Node startNode;
     Node endNode;
 
-    public PathfindingAStar(Coord[] _coords, Map _currentMap, Coord start, Coord end) {
-        nodes = Utility.CoordToNodeArray(_coords, _currentMap);
-        startNode = FindNodeFromCoord(start);
-        endNode = FindNodeFromCoord(end);
-        currentMap = _currentMap;
+    public PathfindingAStar(Coord[] grid, Map currentMap) {
+        this.grid = Utility.CoordToNodeArray(grid, currentMap);
+		this.currentMap = currentMap;
+        startNode = FindNodeFromCoord(currentMap.start);
+        endNode = FindNodeFromCoord(currentMap.end);
     }
 
 	// find a path from a start to a target point
@@ -36,7 +36,7 @@ public class PathfindingAStar {
 
             foreach (Node neighbour in GetNeighboursNode(currentNode)) {
 				// if the neighbour is not ok, check another
-				if (!neighbour.walkable || closedSet.Contains(neighbour)) {
+                if (!neighbour.walkable || closedSet.Contains(neighbour)) {
 					continue;
 				}
                 int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
@@ -65,8 +65,8 @@ public class PathfindingAStar {
 
 	// get distance between two node
 	int GetDistance(Node nodeA, Node nodeB) {
-		int distX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
-		int distY = Mathf.Abs(nodeA.gridY - nodeB.gridY);
+		int distX = Mathf.Abs(nodeA.x - nodeB.x);
+		int distY = Mathf.Abs(nodeA.y - nodeB.y);
 		if (distX > distY) {
             return (Constant.DIAGONAL_WEIGHT * distY) + Constant.VERT_OR_HOR_WEIGHT * (distX - distY);
 		}
@@ -94,11 +94,11 @@ public class PathfindingAStar {
 					continue;
 				}
 				// check if is inside the grid
-				int checkX = currentNode.gridX + x;
-				int checkY = currentNode.gridY + y;
+				int checkX = currentNode.x + x;
+				int checkY = currentNode.y + y;
 				if (checkX > 0 && checkX < currentMap.mapSize.x-1 && checkY > 0 && checkY < currentMap.mapSize.y-1) {
 					// Add to the neighbours
-                    neighbours.Add(nodes[Utility.FindNodeIndex(nodes, checkX, checkY)]);
+                    neighbours.Add(grid[Utility.FindNodeIndex(grid, checkX, checkY)]);
 				}
 			}
 		}
@@ -107,8 +107,8 @@ public class PathfindingAStar {
 
 	// search a node in the grid
 	public Node FindNodeFromCoord(Coord coord) {
-		foreach (Node node in nodes) {
-			if (node.gridX == coord.x && node.gridY == coord.y) {
+		foreach (Node node in grid) {
+			if (node.x == coord.x && node.y == coord.y) {
 				return node;
 			}
 		}

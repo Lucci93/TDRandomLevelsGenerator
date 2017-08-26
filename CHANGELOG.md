@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2017-08-26
+
+### Changed
+
+- Performed comunication between Node class and Coord structure
+- Boolean in pathfinding and map generator work now at the same way
+
+### Fixed
+
+- code is now more readable
+
 ## [1.0.3] - 2017-08-26
 
 ### Removed

@@ -5,12 +5,12 @@ public struct Coord {
 	public int x;
 	public int y;
 	[HideInInspector]
-	public bool isGround;
+	public bool walkable;
 
-	public Coord(int _x, int _y, bool _isGround) {
+	public Coord(int _x, int _y, bool _walkable) {
 		x = _x;
 		y = _y;
-		isGround = _isGround;
+		walkable = _walkable;
 	}
 
 	// override all the function to properly work with coordinates structure
