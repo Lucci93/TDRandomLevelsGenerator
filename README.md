@@ -4,7 +4,7 @@ The project allow you to generate random levels for a tower defense game made in
 You can define the **size** of the grid, the start point and the end point of the path follow by enemies IA and the colors of the background and trail for each level.
 
 <p align="center">
-  <img width="460" height="420" src="store-assets/slide.gif">
+  <img width="460" height="420" src="https://github.com/Lucci93/TDRandomLevelsGenerator/store-assets/slide.gif">
 </p>
 
 ## Contributing
