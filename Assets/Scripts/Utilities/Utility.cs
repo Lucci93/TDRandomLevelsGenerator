@@ -29,9 +29,9 @@ public static class Utility {
 		Debug.Log("---- NODES ----");
 		string text = "";
 		for (int x = 0; x < map.mapSize.x; x++) {
-			for (int y = 0; y < map.mapSize.y; y++) {
-                if (grid.Find(e => e.x == x && e.y == y).parent == null) {
-                    if (grid.Find(e => e.x == x && e.y == y).notWalkable) {
+			for (int y = 0; y < map.mapSize.z; y++) {
+                if (grid.Find(e => e.x == x && e.z == y).parent == null) {
+                    if (grid.Find(e => e.x == x && e.z == y).notFreeCell) {
                         // node add to grid
                         text += "0" + " ";
                     }

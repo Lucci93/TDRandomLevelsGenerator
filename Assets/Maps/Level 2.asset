@@ -14,19 +14,19 @@ MonoBehaviour:
   name: Level 2
   mapSize:
     x: 16
-    y: 16
+    z: 16
     notWalkable: 0
     gCost: 0
     hCost: 0
   start:
     x: 11
-    y: 14
+    z: 14
     notWalkable: 0
     gCost: 0
     hCost: 0
   end:
     x: 1
-    y: 1
+    z: 1
     notWalkable: 0
     gCost: 0
     hCost: 0
@@ -34,3 +34,5 @@ MonoBehaviour:
   seed: 13
   freeCellColor: {r: 0, g: 1, b: 0.91724133, a: 0}
   pathCellColor: {r: 0, g: 0.08965492, b: 1, a: 0}
+  startObjectColor: {r: 0.94482756, g: 1, b: 0, a: 0}
+  endObjectColor: {r: 1, g: 1, b: 1, a: 0}

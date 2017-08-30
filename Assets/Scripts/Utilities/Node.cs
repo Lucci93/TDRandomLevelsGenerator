@@ -4,10 +4,10 @@
 public class Node : IHeapItem<Node> {
 
 	public int x;
-	public int y;
+	public int z;
 
     [HideInInspector]
-	public bool notWalkable;
+	public bool notFreeCell;
     [HideInInspector]
 	public Node parent;
     [HideInInspector]
@@ -23,10 +23,10 @@ public class Node : IHeapItem<Node> {
 
 	int heapIndex;
 
-	public Node(int x, int y, bool walkable) {
-		this.notWalkable = walkable;
+	public Node(int x, int z, bool notFreeCell) {
+		this.notFreeCell = notFreeCell;
 		this.x = x;
-		this.y = y;
+		this.z = z;
 	}
 
 	public int HeapIndex {

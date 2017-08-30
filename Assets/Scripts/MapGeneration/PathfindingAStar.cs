@@ -21,8 +21,8 @@ public class PathfindingAStar {
         this.diagonalWeight = diagonalWeight;
         this.verticalWeight = verticalWeight;
         this.horizontalWeight = horizontalWeight;
-        startNode = grid.Find(e => e.x == currentMap.start.x && e.y == currentMap.start.y);
-        endNode = grid.Find(e => e.x == currentMap.end.x && e.y == currentMap.end.y);
+        startNode = grid.Find(e => e.x == currentMap.start.x && e.z == currentMap.start.z);
+        endNode = grid.Find(e => e.x == currentMap.end.x && e.z == currentMap.end.z);
     }
 
 	// find a path from a start to a target point
@@ -48,7 +48,7 @@ public class PathfindingAStar {
 
                 foreach (Node neighbour in GetNeighboursNode(currentNode)) {
                     // if the neighbour is not ok, check another
-                    if (neighbour.notWalkable || closedSet.Contains(neighbour)) {
+                    if (neighbour.notFreeCell || closedSet.Contains(neighbour)) {
                         continue;
                     }
                     int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
@@ -82,11 +82,11 @@ public class PathfindingAStar {
 		while (true) {
 			Node nearObstacle = GetNeighboursObstaclesCoord(minNode);
 			// remove obstacle to path
-			grid.Find(e => e.x == nearObstacle.x && e.y == nearObstacle.y).notWalkable = false;
+			grid.Find(e => e.x == nearObstacle.x && e.z == nearObstacle.z).notFreeCell = false;
 			Node direction = GetDirectionNode(nearObstacle, minNode);
 
 			// check if in this direction there is another obstacle
-			if (grid.Find(e => e.x == direction.x && e.y == direction.y).notWalkable) {
+			if (grid.Find(e => e.x == direction.x && e.z == direction.z).notFreeCell) {
 				// repeat
 				minNode = nearObstacle;
 			}
@@ -99,14 +99,14 @@ public class PathfindingAStar {
 	// get the position of the next node in the direction of the new coord
 	Node GetDirectionNode(Node newCoord, Node oldCoord) {
 		int x = newCoord.x - oldCoord.x;
-		int y = newCoord.y - oldCoord.y;
-		return new Node(x + newCoord.x, y + newCoord.y, false);
+		int y = newCoord.z - oldCoord.z;
+		return new Node(x + newCoord.x, y + newCoord.z, false);
 	}
 
 	// get distance between two node
 	int GetDistance(Node nodeA, Node nodeB) {
 		int distX = Mathf.Abs(nodeA.x - nodeB.x);
-		int distY = Mathf.Abs(nodeA.y - nodeB.y);
+		int distY = Mathf.Abs(nodeA.z - nodeB.z);
 		if (distX > distY) {
             return (diagonalWeight * distY) + (horizontalWeight * distX) - (verticalWeight * distY);
 		}
@@ -135,10 +135,10 @@ public class PathfindingAStar {
 				}
 				// check if is inside the grid
 				int checkX = currentNode.x + x;
-				int checkY = currentNode.y + y;
-				if (checkX > 0 && checkX < currentMap.mapSize.x-1 && checkY > 0 && checkY < currentMap.mapSize.y-1) {
+				int checkY = currentNode.z + y;
+				if (checkX > 0 && checkX < currentMap.mapSize.x-1 && checkY > 0 && checkY < currentMap.mapSize.z-1) {
 					// Add to the neighbours
-                    neighbours.Add(grid.Find(e => e.x == checkX && e.y == checkY));
+                    neighbours.Add(grid.Find(e => e.x == checkX && e.z == checkY));
 				}
 			}
 		}
@@ -155,11 +155,11 @@ public class PathfindingAStar {
 				}
 				// check if is inside the grid
 				int checkX = currentNode.x + x;
-				int checkY = currentNode.y + y;
-				// chek if is out of bounds and a ostacle
-				if (checkX > 0 && checkX < currentMap.mapSize.x - 1 && checkY > 0 && checkY < currentMap.mapSize.y - 1 && grid.Find(e => e.x == checkX && e.y == checkY).notWalkable) {
+				int checkY = currentNode.z + y;
+				// chek if is not out of bounds and a ostacle
+				if (checkX > 0 && checkX < currentMap.mapSize.x - 1 && checkY > 0 && checkY < currentMap.mapSize.z - 1 && grid.Find(e => e.x == checkX && e.z == checkY).notFreeCell) {
 					// return to the neighbours
-					return grid.Find(e => e.x == checkX && e.y == checkY);
+					return grid.Find(e => e.x == checkX && e.z == checkY);
 				}
 			}
 		}

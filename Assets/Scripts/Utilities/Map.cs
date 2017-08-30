@@ -15,6 +15,9 @@ public class Map : ScriptableObject {
 	[Range(0.5f, 1)] public double groundPercent;
 	// seed for the pseudorandom generation of the obstacles
 	public int seed;
+    // color for the element of the map
 	public Color freeCellColor;
 	public Color pathCellColor;
+    public Color startObjectColor;
+    public Color endObjectColor;
 }

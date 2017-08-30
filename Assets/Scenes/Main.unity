@@ -138,6 +138,10 @@ MonoBehaviour:
   freeCellObject: {fileID: 1434319406015698, guid: d772bf0407f4e4ff08d7ed1b7dbc2e4a,
     type: 2}
   pathObject: {fileID: 1696424637748114, guid: a9fc4487aeded4789921f37ad1363fc8, type: 2}
+  startObject: {fileID: 1133353906273818, guid: 2fbfdc0cdbaee4b15bca63cd54d3af18,
+    type: 2}
+  endObject: {fileID: 1133353906273818, guid: dc975fc8c0f8c42b9aa9ee226e410b02, type: 2}
+  addStartAndEndObject: 1
   cellThreshold: 5
   diagonalWeight: 14
   verticalWeight: 10
